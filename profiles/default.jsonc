@@ -1,0 +1,39 @@
+/* ex:
+
+{
+  "version": 1,
+  "name": "Example",
+  "description": "This is an example profile.",
+  "canBeEdited": true,
+  "canBeDuplicated": false,
+  "template": false,
+  "keywords": {
+    "state": "function"
+  },
+  "functions": {
+    "echo": "print"
+  },
+  "shortcuts": {
+    "hello": {
+      "expandsTo": "print(\"hello\")",
+      "description": "Prints hello to the console",
+      "enabled": true
+    }
+  }
+}
+
+*/
+
+{
+  "profile1": {
+    "version": 1,
+    "name": "Default",
+    "description": "This is the default profile, used to start new ones",
+    "canBeEdited": false,
+    "canBeDuplicated": true,
+    "template": true,
+    "keywords": {},
+    "functions": {},
+    "shortcuts": {}
+  }
+}

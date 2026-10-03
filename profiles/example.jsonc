@@ -1,0 +1,20 @@
+// Opt-in examples. Nothing here is enabled by the default Blank profile.
+{
+  "example": {
+    "version": 1,
+    "name": "Example",
+    "description": "Demonstrates renaming and fixed shortcuts.",
+    "canBeEdited": true,
+    "canBeDuplicated": false,
+    "template": false,
+    "keywords": { "state": "function" },
+    "functions": { "echo": "print" },
+    "shortcuts": {
+      "hello": {
+        "expandsTo": "print(\"hello\")",
+        "description": "Prints hello to the console",
+        "enabled": true
+      }
+    }
+  }
+}

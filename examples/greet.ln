@@ -1,0 +1,8 @@
+-- A local profile changes code, never strings or comments.
+state greet(name)
+    echo("hello " .. name .. " from Luna!")
+end
+
+greet("User")
+hello
+echo("state, echo and hello stay unchanged inside strings")
