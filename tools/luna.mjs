@@ -13,7 +13,7 @@ const record = value => value !== null && typeof value === 'object' && !Array.is
 export class LunaError extends Error {}
 
 // Keep original token text and offsets, including all trivia.
-export function tokenize(source) {
+export function tokenize(source, { allowIncomplete = false } = {}) {
     const tokens = [];
     let i = 0;
     const add = (kind, end) => {
@@ -25,7 +25,10 @@ export function tokenize(source) {
         if (!opener) return null;
         const close = ']' + opener[1] + ']';
         const end = source.indexOf(close, start + opener[0].length);
-        if (end < 0) throw new LunaError('Unterminated long string or comment');
+        if (end < 0) {
+            if (allowIncomplete) return source.length;
+            throw new LunaError('Unterminated long string or comment');
+        }
         return end + close.length;
     };
     while (i < source.length) {
@@ -55,11 +58,17 @@ export function tokenize(source) {
                         if (source[end - 1] === '\r' && source[end] === '\n') end++;
                     }
                 } else {
-                    if (/[\r\n]/.test(source[end])) throw new LunaError('Unescaped newline in string');
+                    if (/[\r\n]/.test(source[end])) {
+                        if (allowIncomplete) break;
+                        throw new LunaError('Unescaped newline in string');
+                    }
                     end++;
                 }
             }
-            if (end >= source.length) throw new LunaError('Unterminated string');
+            if (end >= source.length || source[end] !== quote) {
+                if (allowIncomplete) { add('string', Math.min(end, source.length)); continue; }
+                throw new LunaError('Unterminated string');
+            }
             add('string', end + 1);
             continue;
         }

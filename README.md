@@ -6,9 +6,11 @@ sooo, i wanted to make a Roblox inspired platform with easier game creation, and
 
 Luna is the scripting language for that project. The idea is to give creators more control over how they build games, with customizable names, visual scripting, and tools that work together.
 
+(also, use [the VSCode icon](https://github.com/Crazy-Or-Something/Luna-VSCode/releases/latest) if u use VSCode _~~(please use it)~~_)
+
 ## Status
 
-Very early development. A first JSON/JSONC-profile translator is working: keyword aliases, function aliases, and fixed shortcuts can be translated and tested with the local Lua runtime. Visual Luna, sandboxing, and editor integrations are still planned.
+Very early development. A first JSON/JSONC-profile translator is working: keyword aliases, function aliases, and fixed shortcuts can be translated and tested with the local Lua runtime. A first VS Code extension supports highlighting and profile-aware completions. Visual Luna, sandboxing, and game-editor integration are still planned.
 
 ## Features and roadmap
 
@@ -42,9 +44,9 @@ The translator recognizes tokens rather than replacing every matching word: stri
 
 Keep multiple profiles in one `.jsonc` file, with `//` and `/* ... */` comments for examples and notes.
 
-The default profile is **Blank**: no renaming or shortcuts are active. The commented example stays documentation, not defaults. [Example rules](profiles/example.jsonc) are opt-in.
+The default profile is **Default**: no renaming or shortcuts are active. The commented example stays documentation, not defaults. [Example rules](profiles/example.jsonc) are opt-in.
 
-Each profile has an ID, a visible `name`, a `description`, and `canBeEdited`, `canBeDuplicated`, and `template` metadata. The CLI can list profiles and duplicate Blank into an editable, non-template copy. Editor permissions are metadata for the future editor; they do not lock files on disk.
+Each profile has an ID, a visible `name`, a `description`, and `canBeEdited`, `canBeDuplicated`, and `template` metadata. The CLI can list profiles and duplicate Default into an editable, non-template copy. Editor permissions are metadata for the future editor; they do not lock files on disk.
 
 Shortcuts support `"enabled": false` to keep a rule without activating it.
 
@@ -64,9 +66,21 @@ Start with blocks, then move a behavior to code when you need more control. Conv
 
 ### VS Code integration
 
-An official extension is planned so VS Code and the game editor can work with the same project files.
+The [Luna extension](https://github.com/Crazy-Or-Something/Luna-VSCode) supports `.ln` files: syntax highlighting, profile-aware autocomplete, hover descriptions, and profile selection from the status bar.
 
-That includes shared naming profiles, autocomplete, diagnostics, and a way to launch a playtest from VS Code.
+It reads the same JSON/JSONC profiles as the CLI. Disabled shortcuts stay out of completions.
+
+Download the `.vsix` from the [latest release](https://github.com/Crazy-Or-Something/Luna-VSCode/releases/latest), then use **Extensions: Install from VSIX...** in VS Code.
+
+To build it yourself, run this inside the Luna-VSCode repository:
+
+```powershell
+powershell -NoProfile -File .\package.ps1
+```
+
+The installer is generated in `build/`.
+
+Game-editor integration, playtesting, and full language diagnostics are still planned.
 
 ## Why?
 
@@ -89,6 +103,6 @@ node tools/luna.mjs run examples/blank.ln
 node tools/luna.mjs run examples/greet.ln --profile profiles/example.jsonc --profile-id example
 ```
 
-Start from [Blank](profiles/default.jsonc) by duplicating it, or try [Example](profiles/example.jsonc) explicitly. Use `--profile` to choose a file and `--profile-id` to select a profile. If the file contains multiple profiles, selecting an ID is required. For example, the enabled `hello` shortcut expands to `print("hello")` without declaring a function.
+Start from [Default](profiles/default.jsonc) by duplicating it, or try [Example](profiles/example.jsonc) explicitly. Use `--profile` to choose a file and `--profile-id` to select a profile. If the file contains multiple profiles, selecting an ID is required. For example, the enabled `hello` shortcut expands to `print("hello")` without declaring a function.
 
 This is a developer prototype for trusted local scripts. The runtime is not sandboxed yet.

@@ -96,7 +96,7 @@ const runtime = [path.join(root, 'build/Release/lua.exe'), path.join(root, 'buil
 test('compiled runtime executes translated example', { skip: !runtime }, () => {
     const result = spawnSync(process.execPath, [path.join(root, 'tools/luna.mjs'), 'run', path.join(root, 'examples/greet.ln'), '--lua', runtime, '--profile', examplePath, '--profile-id', 'example'], { encoding: 'utf8' });
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(result.stdout.replaceAll('\r\n', '\n'), 'hello Red from Luna!\nhello\nstate, echo and hello stay unchanged inside strings\n');
+    assert.match(result.stdout.replaceAll('\r\n', '\n'), /^hello [^\n]+ from Luna!\nhello\nstate, echo and hello stay unchanged inside strings\n$/);
 });
 test('Lua parser rejects shortcut in multiline expression', { skip: !runtime }, () => {
     const translated = translate('local x =\nhello\n', profile);

@@ -18,15 +18,15 @@ node --test tools/luna.test.mjs
 The opt-in example prints:
 
 ```text
-hello Red from Luna!
+hello User from Luna!
 hello
 state, echo and hello stay unchanged inside strings
 ```
 
 ## JSONC and profile collections
 
-`profiles/default.jsonc` contains a commented usage example and one active profile, `profile1` (Blank).
-Comments do not activate rules. Blank has no aliases or shortcuts.
+`profiles/default.jsonc` contains a commented usage example and one active profile, `profile1` (Default).
+Comments do not activate rules. Default has no aliases or shortcuts.
 JSONC accepts `//` comments, `/* ... */` comments, and trailing commas.
 Comment markers inside quoted strings stay intact.
 Files ending in `.json` use strict JSON for backwards compatibility.
@@ -37,8 +37,8 @@ A collection has profile IDs as its outer keys:
 {
   "profile1": {
     "version": 1,
-    "name": "Blank",
-    "description": "This is a blank profile, used to start new ones",
+    "name": "Default",
+    "description": "This is the default profile, used to start new ones",
     "canBeEdited": false,
     "canBeDuplicated": true,
     "template": true,
@@ -60,7 +60,7 @@ node tools/luna.mjs duplicate-profile --profile-id profile1 --new-id myProfile -
 node tools/luna.mjs profiles --profile profiles/my-profiles.jsonc
 ```
 
-The new collection contains Blank and your copy. The copy is editable and is no longer a template.
+The new collection contains Default and your copy. The copy is editable and is no longer a template.
 Edit `myProfile` in the new file, then run with:
 
 ```powershell
@@ -113,4 +113,35 @@ This is a Node.js tooling prototype around our Lua source, not yet a native Luna
 The runner executes trusted local code with Lua's normal libraries; sandboxing is not implemented.
 Shortcuts are fixed statements, with no parameters yet.
 Line breaks are preserved, but diagnostic columns refer to translated code.
-Full scope analysis, Visual Luna, the editor, and the VS Code extension are still planned.
+Full scope analysis, Visual Luna, and game-editor integration are still planned. The VS Code extension already provides highlighting and profile-aware completions.
+
+## VS Code
+
+The extension lives in the separate [Luna-VSCode repository](https://github.com/Crazy-Or-Something/Luna-VSCode). See its README for installation and configuration.
+It supports syntax highlighting, profile-aware completions, hover descriptions, profile selection, and a default icon for `.ln` files.
+It uses the same profile reader and tokenizer as the CLI.
+
+Download the `.vsix` from the [latest release](https://github.com/Crazy-Or-Something/Luna-VSCode/releases/latest), then run **Extensions: Install from VSIX...** in VS Code.
+
+To build a local installer, run these commands from the Luna-VSCode repository root:
+
+```powershell
+powershell -NoProfile -File .\package.ps1
+```
+
+The installer is generated in that repository's `build/` directory, with the version from `package.json` in its filename.
+Packaging syncs the shared runtime from a sibling `../Luna/tools` directory when available; otherwise it uses the existing bundled runtime.
+For a different source location, run `node sync-runtime.cjs "C:\path\to\Luna\tools"` before packaging.
+
+Run the language tests from the Luna repository root:
+
+```powershell
+node --test tools/luna.test.mjs
+```
+
+Run the extension tests from the Luna-VSCode repository root, with Luna in the sibling `../Luna` directory:
+
+```powershell
+node sync-runtime.cjs
+node --test test/core.test.mjs
+```
