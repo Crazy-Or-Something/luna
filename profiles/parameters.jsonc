@@ -1,0 +1,24 @@
+// Optional example. The default profile stays empty.
+{
+  "parameters": {
+    "version": 1,
+    "name": "Parameterized shortcuts",
+    "description": "Opt-in templates with arguments.",
+    "shortcuts": {
+      "say": {
+        "parameters": [
+          "message"
+        ],
+        "expandsTo": "print(${message})",
+        "description": "Print a message"
+      },
+      "twice": {
+        "parameters": [
+          "value"
+        ],
+        "expandsTo": "print(${value}, ${value})",
+        "description": "Print one value twice, evaluating it once"
+      }
+    }
+  }
+}

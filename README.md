@@ -10,7 +10,7 @@ Luna is the scripting language for that project. The idea is to give creators mo
 
 ## Status
 
-Very early development. A first JSON/JSONC-profile translator is working: keyword aliases, function aliases, and fixed shortcuts can be translated and tested with the local Lua runtime. A first VS Code extension supports highlighting and profile-aware completions. Visual Luna, sandboxing, and game-editor integration are still planned.
+Very early development. A first JSON/JSONC-profile translator is working: keyword aliases, function aliases, and fixed or parameterized shortcuts can be translated and tested with the local Lua runtime. A first VS Code extension supports highlighting, profile-aware completions, live diagnostics, and syntax checks. Visual Luna, sandboxing, and game-editor integration are still planned.
 
 ## Features and roadmap
 
@@ -55,6 +55,32 @@ node tools/luna.mjs profiles
 node tools/luna.mjs duplicate-profile --profile-id profile1 --new-id myProfile --name "My profile" --output profiles/my-profiles.jsonc
 ```
 
+### Shortcuts with parameters
+
+Shortcuts can also take arguments. Define a template in your profile:
+
+```jsonc
+"say": {
+  "parameters": ["message"],
+  "expandsTo": "print(${message})",
+  "description": "Print a message"
+}
+```
+
+Then use it on its own line:
+
+```ln
+say("hello from Luna!")
+```
+
+Arguments are evaluated once, from left to right. Reusing `${message}` in a template reuses the captured value. Placeholders inside strings remain literal text.
+
+Try [the parameter example](examples/parameters.ln) with [its opt-in profile](profiles/parameters.jsonc). The default profile still has no active rules.
+
+### Clearer errors
+
+Translation errors include the original line and column. Add `--diagnostics json` to receive a JSON error object on stderr for tools and editors. Lua syntax errors report source lines; translated columns are not mapped back.
+
 ### Visual Luna
 
 Build behaviors with visual blocks, inspired by Scratch and GameMaker, and see the Luna code they generate.
@@ -66,7 +92,7 @@ Start with blocks, then move a behavior to code when you need more control. Conv
 
 ### VS Code integration
 
-The [Luna extension](https://github.com/Crazy-Or-Something/Luna-VSCode) supports `.ln` files: syntax highlighting, profile-aware autocomplete, hover descriptions, and profile selection from the status bar.
+The [Luna extension](https://github.com/Crazy-Or-Something/Luna-VSCode) supports `.ln` files: syntax highlighting, profile-aware autocomplete, hover descriptions, live translation diagnostics, syntax checks, and profile selection from the status bar.
 
 It reads the same JSON/JSONC profiles as the CLI. Disabled shortcuts stay out of completions.
 
@@ -80,7 +106,7 @@ powershell -NoProfile -File .\package.ps1
 
 The installer is generated in `build/`.
 
-Game-editor integration, playtesting, and full language diagnostics are still planned.
+Game-editor integration, playtesting, and full language diagnostics are still planned. Parameterized shortcuts require the updated shared runtime; VS Code 0.2.0 ships an earlier runtime, so rebuild from the sibling extension repository to use these profiles there. Completion snippets for parameters are still planned.
 
 ## Why?
 
@@ -101,6 +127,7 @@ See [Getting started](docs/getting-started.md) for building the runtime and runn
 ```powershell
 node tools/luna.mjs run examples/blank.ln
 node tools/luna.mjs run examples/greet.ln --profile profiles/example.jsonc --profile-id example
+node tools/luna.mjs run examples/parameters.ln --profile profiles/parameters.jsonc --profile-id parameters
 ```
 
 Start from [Default](profiles/default.jsonc) by duplicating it, or try [Example](profiles/example.jsonc) explicitly. Use `--profile` to choose a file and `--profile-id` to select a profile. If the file contains multiple profiles, selecting an ID is required. For example, the enabled `hello` shortcut expands to `print("hello")` without declaring a function.

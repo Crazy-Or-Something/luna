@@ -1,0 +1,10 @@
+-- Run with profiles/parameters.jsonc, profile ID parameters.
+say("hello from a shortcut!")
+
+local count = 0
+function nextValue()
+    count = count + 1
+    return count
+end
+twice(nextValue())
+print("calls: " .. count)

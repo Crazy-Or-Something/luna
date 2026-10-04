@@ -12,7 +12,7 @@ node tools/luna.mjs profiles
 node tools/luna.mjs translate examples/greet.ln --profile profiles/example.jsonc --profile-id example
 node tools/luna.mjs check examples/greet.ln --profile profiles/example.jsonc --profile-id example
 node tools/luna.mjs run examples/greet.ln --profile profiles/example.jsonc --profile-id example
-node --test tools/luna.test.mjs
+node --test tools/luna.test.mjs tools/shortcuts.test.mjs
 ```
 
 The opt-in example prints:
@@ -107,11 +107,54 @@ Translation is one pass; expansions must use canonical Lua names, not other shor
 Use `--output file.lua` with `translate` to save the result.
 Use `--lua path/to/lua.exe` to select another runtime.
 
+## Parameterized shortcuts
+
+Keep existing fixed shortcuts as they are. Add `parameters` to opt into call syntax; an empty list means the shortcut must be called with `()`.
+
+```jsonc
+"twice": {
+  "parameters": ["value"],
+  "expandsTo": "print(${value}, ${value})",
+  "enabled": true
+}
+```
+
+```ln
+twice(nextValue())
+```
+
+`nextValue()` is evaluated once. The template uses its captured value twice. All arguments are evaluated once, from left to right, even when a parameter is unused. Each argument contributes one Lua value; extra return values are discarded. Generated locals avoid names used in source and templates.
+
+Parameters must be unique non-reserved identifiers. `${name}` placeholders are recognized only in code, with no spaces inside the marker. Quoted `${name}` text is preserved. Templates use canonical Lua names, and cannot recursively call other shortcuts.
+
+A call must occupy its own line and fit on one line. Parenthesized expressions, nested calls, tables, indexes, and commas inside strings are supported. Anonymous function literals, comments inside arguments, nested shortcuts, and shortcut calls in expressions are not supported. A trailing comment after the call is allowed.
+
+The translator checks delimiters and argument counts; Lua checks the resulting expression syntax.
+
+```powershell
+node tools/luna.mjs run examples/parameters.ln --profile profiles/parameters.jsonc --profile-id parameters
+```
+
+## Error locations and JSON diagnostics
+
+Translation and tokenization errors carry original source offsets plus one-based line and column numbers. Offsets and columns count UTF-16 code units, matching JavaScript editor APIs. JSONC parse errors include locations when the parser provides them. Profile validation and configuration errors may have a file without a position.
+
+```powershell
+node tools/luna.mjs check examples/parameters.ln --profile profiles/parameters.jsonc --profile-id parameters --diagnostics json
+```
+
+Failures exit with code 1 and write one JSON object to stderr:
+
+```json
+{"diagnostics":[{"severity":"error","message":"Line 2: ...","file":"/project/script.ln","line":2,"column":9,"start":20,"end":24}]}
+```
+
+Successful commands retain their normal stdout output. `--diagnostics json` is available for all CLI commands. It reports the first failure, rather than collecting all errors. Lua errors are attached to the script line; column 1 is used because translated columns are not mapped. `check` compiles without execution; `run` executes trusted local code as before.
 ## Current boundaries
 
 This is a Node.js tooling prototype around our Lua source, not yet a native Luna CLI.
 The runner executes trusted local code with Lua's normal libraries; sandboxing is not implemented.
-Shortcuts are fixed statements, with no parameters yet.
+Shortcuts are statements and must occupy a single source line. Parameterized calls cannot be used as expressions; multiline arguments and anonymous functions in arguments are outside the initial scope. Pass a named function instead.
 Line breaks are preserved, but diagnostic columns refer to translated code.
 Full scope analysis, Visual Luna, and game-editor integration are still planned. The VS Code extension already provides highlighting and profile-aware completions.
 
@@ -145,3 +188,5 @@ Run the extension tests from the Luna-VSCode repository root, with Luna in the s
 node sync-runtime.cjs
 node --test test/core.test.mjs
 ```
+
+The published VS Code 0.2.0 runtime predates parameterized shortcuts. To use these profiles in a development build, run `node sync-runtime.cjs` and rebuild the extension from the sibling Luna-VSCode repository. Parameter-aware completion snippets are not included yet.
