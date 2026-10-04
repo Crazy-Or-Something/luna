@@ -6,7 +6,7 @@ sooo, i wanted to make a Roblox inspired platform with easier game creation, and
 
 Luna is the scripting language for that project. The idea is to give creators more control over how they build games, with customizable names, visual scripting, and tools that work together.
 
-(also, use [the VSCode icon](https://github.com/Crazy-Or-Something/Luna-VSCode/releases/latest) if u use VSCode _~~(please use it)~~_)
+(also, use [the VSCode icon](https://github.com/Crazy-Or-Something/Luna-VSCode/releases/latest) if u use VSCode _**~~(please use it)~~**_)
 
 ## Status
 
